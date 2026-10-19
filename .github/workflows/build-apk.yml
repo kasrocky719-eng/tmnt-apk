@@ -24,6 +24,8 @@ jobs:
           git remote add origin https://github.com/nikita36078/J2ME-Loader.git
           git fetch --depth 1 origin 3646418081e37f669972085fbdc623b38ef29354
           git checkout -q FETCH_HEAD
+           git submodule update --init
+          unzip -o ../overlay.zip
           unzip -o ../overlay.zip
           rm -f app/src/midlet/java/com/example/porting/HelloMidlet.java
           rm -f app/src/midlet/resources/com/example/porting/sample.ext
