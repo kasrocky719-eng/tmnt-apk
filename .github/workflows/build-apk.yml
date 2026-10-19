@@ -1,1 +1,41 @@
+name: Build TMNT APK
 
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Скачать J2ME Loader и наложить игру
+        run: |
+          mkdir src && cd src
+          git init -q
+          git remote add origin https://github.com/nikita36078/J2ME-Loader.git
+          git fetch --depth 1 origin 3646418081e37f669972085fbdc623b38ef29354
+          git checkout -q FETCH_HEAD
+          unzip -o ../overlay.zip
+          rm -f app/src/midlet/java/com/example/porting/HelloMidlet.java
+          rm -f app/src/midlet/resources/com/example/porting/sample.ext
+
+      - name: Собрать APK
+        working-directory: src
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleMidletDebug --stacktrace
+
+      - name: Сохранить APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: TMNT-Ninja-Tribunal-apk
+          path: src/app/build/outputs/apk/midlet/debug/*.apk
